@@ -1,10 +1,13 @@
 import random
 
+import tensorflow as tf
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 from keras import backend as K
-from keras.preprocessing import image
+#from keras.preprocessing import image
+#from tensorflow.keras.utils import image_dataset_from_directory
+from tensorflow.keras.utils import load_img
 from sklearn.metrics import roc_auc_score, roc_curve
 from tensorflow.compat.v1.logging import INFO, set_verbosity
 import os
@@ -19,18 +22,18 @@ def get_mean_std_per_batch(image_dir, df, H=320, W=320):
     for img in df.sample(100)["Image"].values:
         image_path = os.path.join(image_dir, img)
         sample_data.append(
-            np.array(image.load_img(image_path, target_size=(H, W))))
+            np.array(load_img(image_path, target_size=(H, W))))
 
     mean = np.mean(sample_data, axis=(0, 1, 2, 3))
     std = np.std(sample_data, axis=(0, 1, 2, 3), ddof=1)
     return mean, std
 
 
-def load_image(img, image_dir, df, preprocess=True, H=320, W=320):
+def my_load_image(img, image_dir, df, preprocess=True, H=320, W=320):
     """Load and preprocess image."""
     mean, std = get_mean_std_per_batch(image_dir, df, H=H, W=W)
     img_path = os.path.join(image_dir, img)
-    x = image.load_img(img_path, target_size=(H, W))
+    x = load_img(img_path, target_size=(H, W))
     if preprocess:
         x -= mean
         x /= std
@@ -61,7 +64,7 @@ def grad_cam(input_model, image, cls, layer_name, H=320, W=320):
 
 def compute_gradcam(model, img, image_dir, df, labels, selected_labels,
                     layer_name='bn'):
-    preprocessed_input = load_image(img, image_dir, df)
+    preprocessed_input = my_load_image(img, image_dir, df)
     predictions = model.predict(preprocessed_input)
 
     print("Loading original image")
@@ -69,7 +72,7 @@ def compute_gradcam(model, img, image_dir, df, labels, selected_labels,
     plt.subplot(151)
     plt.title("Original")
     plt.axis('off')
-    plt.imshow(load_image(img, image_dir, df, preprocess=False), cmap='gray')
+    plt.imshow(my_load_image(img, image_dir, df, preprocess=False), cmap='gray')
 
     j = 1
     for i in range(len(labels)):
@@ -79,7 +82,7 @@ def compute_gradcam(model, img, image_dir, df, labels, selected_labels,
             plt.subplot(151 + j)
             plt.title(f"{labels[i]}: p={predictions[0][i]:.3f}")
             plt.axis('off')
-            plt.imshow(load_image(img, image_dir, df, preprocess=False),
+            plt.imshow(my_load_image(img, image_dir, df, preprocess=False),
                        cmap='gray')
             plt.imshow(gradcam, cmap='jet', alpha=min(0.5, predictions[0][i]))
             j += 1
