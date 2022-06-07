@@ -2,9 +2,12 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from test_utils import *
-from keras import backend
+import tensorflow as tf 
+from tensorflow.keras import backend as K
 from test_case import *
 from IPython.display import display
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
+
 np.random.seed(3)
 
 ### ex1
