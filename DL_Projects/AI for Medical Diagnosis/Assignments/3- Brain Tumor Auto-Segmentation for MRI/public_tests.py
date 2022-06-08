@@ -3,10 +3,11 @@ import pandas as pd
 import seaborn as sns
 from test_utils import *
 import tensorflow as tf 
-from tensorflow.keras import backend as K
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
+from tensorflow.compat.v1.keras import backend as K
 from test_case import *
 from IPython.display import display
-tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
+
 
 np.random.seed(3)
 
@@ -127,7 +128,7 @@ def standardize_test(target, X):
 ### ex3
 def single_class_dice_coefficient_test(target, epsilon, sess):
     pred_1, label_1, pred_2, label_2 = single_class_dice_coefficient_test_case(sess)
-        
+    
     expected_output_1 = np.float64(0.6)
     expected_output_2 = np.float64(0.8333333333333334) 
         

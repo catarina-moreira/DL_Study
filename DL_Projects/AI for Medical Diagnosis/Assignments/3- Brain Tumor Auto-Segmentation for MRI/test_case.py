@@ -1,5 +1,7 @@
 import numpy as np
-from keras import backend as K
+import tensorflow as tf 
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
+from tensorflow.compat.v1.keras import backend as K
 import pandas as pd
 np.random.seed(3)
 
