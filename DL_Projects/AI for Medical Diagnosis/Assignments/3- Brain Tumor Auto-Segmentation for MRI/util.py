@@ -7,8 +7,8 @@ import numpy as np
 import tensorflow as tf
 from IPython.display import Image
 from tensorflow.keras import backend as K
-from tensorflow.keras import Model, Input
-from tensorflow.keras.layers import (Activation,Conv3D,Conv3DTranspose,MaxPooling3D,UpSampling3D,Concatenate)
+from tensorflow.keras.models import Model 
+from tensorflow.keras.layers import (Input, Activation,Conv3D,Conv3DTranspose,MaxPooling3D,UpSampling3D,Concatenate)
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.utils import to_categorical
 from tensorflow.compat.v1.logging import INFO, set_verbosity
@@ -164,14 +164,14 @@ def unet_model_3d(loss_function, input_shape=(4, 160, 160, 16),
         up_convolution = get_up_convolution(pool_size=pool_size,
                                             deconvolution=deconvolution,
                                             n_filters=
-                                            current_layer._keras_shape[1])(
+                                            current_layer.shape[1])(
             current_layer)
-        concat = concatenate([up_convolution, levels[layer_depth][1]], axis=1)
+        concat = Concatenate(axis=1)([up_convolution, levels[layer_depth][1]])
         current_layer = create_convolution_block(
-            n_filters=levels[layer_depth][1]._keras_shape[1],
+            n_filters=levels[layer_depth][1].shape[1],
             input_layer=concat, batch_normalization=batch_normalization)
         current_layer = create_convolution_block(
-            n_filters=levels[layer_depth][1]._keras_shape[1],
+            n_filters=levels[layer_depth][1].shape[1],
             input_layer=current_layer,
             batch_normalization=batch_normalization)
 
@@ -182,7 +182,7 @@ def unet_model_3d(loss_function, input_shape=(4, 160, 160, 16),
     if not isinstance(metrics, list):
         metrics = [metrics]
 
-    model.compile(optimizer=Adam(lr=initial_learning_rate), loss=loss_function,
+    model.compile(optimizer=Adam(learning_rate=initial_learning_rate), loss=loss_function,
                   metrics=metrics)
     return model
 
